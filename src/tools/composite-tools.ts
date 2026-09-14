@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ghl } from "../ghl-client.js";
 import { config } from "../config.js";
 import { PIPELINES, REFERRAL_PARTNER_STAGES, STAFF } from "../known-ids.js";
+import { enrichOpportunities, enrichContacts } from "../reference-data.js";
 
 /**
  * These map to the named searches in Filipa's brief. None of these are
@@ -28,7 +29,7 @@ export const compositeTools = [
         status: "open",
         limit: 100,
       });
-      return data.opportunities ?? data;
+      return enrichOpportunities(data.opportunities ?? []);
     },
   },
 
@@ -47,7 +48,7 @@ export const compositeTools = [
         locationId: config.ghlLocationId,
         limit: input.limit,
       });
-      const contacts = data.contacts ?? data ?? [];
+      const contacts = await enrichContacts(data.contacts ?? []);
       const today = new Date();
       return contacts.filter((c: any) => {
         const followUpField = (c.customFields ?? []).find(
@@ -81,17 +82,16 @@ export const compositeTools = [
         }),
       ]);
 
-      const closedLost = (closedLostContacts.contacts ?? closedLostContacts ?? []).filter(
-        (c: any) => {
-          const leadStatus = (c.customFields ?? []).find(
-            (f: any) => f.key === "lead_status" || f.id === "WvgRWIW2DJoIJiz9MTbb"
-          );
-          return leadStatus?.value === "Closed Lost";
-        }
-      );
+      const enrichedContacts = await enrichContacts(closedLostContacts.contacts ?? []);
+      const closedLost = enrichedContacts.filter((c: any) => {
+        const leadStatus = (c.customFields ?? []).find(
+          (f: any) => f.key === "lead_status" || f.id === "WvgRWIW2DJoIJiz9MTbb"
+        );
+        return leadStatus?.value === "Closed Lost";
+      });
 
       return {
-        dormantReferralPartners: dormantPartners.opportunities ?? dormantPartners,
+        dormantReferralPartners: await enrichOpportunities(dormantPartners.opportunities ?? []),
         closedLostContacts: closedLost,
       };
     },
@@ -109,7 +109,7 @@ export const compositeTools = [
         pipeline_stage_id: REFERRAL_PARTNER_STAGES.ACTIVE_REFERRAL_PARTNER,
         limit: 100,
       });
-      return data.opportunities ?? data;
+      return enrichOpportunities(data.opportunities ?? []);
     },
   },
 ];

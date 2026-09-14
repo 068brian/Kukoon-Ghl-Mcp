@@ -1,29 +1,33 @@
 {
-  "name": "kukoon-ghl-mcp",
+  "name": "receipt-automation-mcp",
   "version": "1.0.0",
-  "description": "Read-only MCP server bridging Kukoon's GoHighLevel CRM to ChatGPT (Charlie) via Model Context Protocol.",
-  "main": "dist/index.js",
-  "type": "module",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsc && node dist/index.js",
+    "test:mailbox": "node scripts/test-mailbox.mjs",
+    "list:site-files": "node scripts/list-site-files.mjs",
+    "test:pipeline": "node scripts/test-full-pipeline.mjs",
+    "test:pdf": "node scripts/test-pdf-extraction.mjs"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0",
-    "axios": "^1.7.9",
-    "cors": "^2.8.6",
-    "express": "^4.21.2",
-    "zod": "^3.24.1"
+    "@azure/msal-node": "^6.0.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.21",
-    "@types/node": "^22.10.5",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
-  },
-  "engines": {
-    "node": ">=20"
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.4.1",
+    "@types/pdf-parse": "^1.1.5",
+    "typescript": "^7.0.2"
   }
 }
